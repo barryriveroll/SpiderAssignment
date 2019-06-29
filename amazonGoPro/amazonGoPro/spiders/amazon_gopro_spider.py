@@ -1,5 +1,17 @@
 import scrapy
-from scrapy.exceptions import DropItem
+import json
+import os
+
+id_list = []
+dirname = os.path.dirname(__file__)
+
+# if filename is not None:
+new_json = open(os.path.join(dirname, '../../amazon_gopro.json'), 'w+')
+# with open(os.path.join(dirname, '../../amazon_gopro.json'), 'w+') as data_file:
+#     if json.load(data_file) is not None:
+#         data = json.load(data_file)
+#         for review in data:
+#             id_list.append(review['id'])
 
 class QuotesSpider(scrapy.Spider):
     name = "amazon_gopro"
@@ -8,14 +20,20 @@ class QuotesSpider(scrapy.Spider):
     ]
 
     def parse(self, response):
+
         for review in response.css('div.aok-relative'):
-            yield {
-                'id': review.css('div.review::attr(id)').get(),
-                'title': review.css('a.review-title span::text').get(),
-                'date': review.css('span.review-date::text').get(),
-                'rating': review.css('span.a-icon-alt::text').get(),
-                'text': review.css('span.review-text-content span').get(),
-            }
+            new_id = review.css('div.review::attr(id)').get()
+            if new_id not in id_list:
+                id_list.append(new_id)
+                yield {
+                    'id': review.css('div.review::attr(id)').get(),
+                    'title': review.css('a.review-title span::text').get(),
+                    'date': review.css('span.review-date::text').get(),
+                    'rating': review.css('span.a-icon-alt::text').get(),
+                    'text': review.css('span.review-text-content span').get(),
+                }
+            else:
+                print("DUPLICATE FOUND")
 
         all_reviews = response.css('div#reviews-medley-footer a.a-text-bold::attr(href)').get()
         if all_reviews is not None:
