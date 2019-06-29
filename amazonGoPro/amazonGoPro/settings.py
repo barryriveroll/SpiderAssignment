@@ -64,9 +64,16 @@ ROBOTSTXT_OBEY = True
 
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
-#    'amazonGoPro.pipelines.AmazongoproPipeline': 300,
-#}
+ITEM_PIPELINES = {
+   'amazonGoPro.pipelines.AmazongoproPipeline': 300,
+}
+
+# MongoDB settings
+MONGODB_SERVER = "localhost"
+MONGODB_PORT = 27017
+MONGODB_DB = "amazon_scrapy"
+MONGODB_REVIEWS_COLLECTION = "reviews"
+MONGODB_PRODUCTS_COLLECTION = "products"
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html
