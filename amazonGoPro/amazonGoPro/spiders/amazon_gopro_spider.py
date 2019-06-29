@@ -1,17 +1,13 @@
 import scrapy
 import json
 import os
-
-id_list = []
 dirname = os.path.dirname(__file__)
 
-# if filename is not None:
+# Wipe existing file if it's there, or else create a new one. Prevents stacking multiple arrays of
+# data when the spider is run multiple times.
 new_json = open(os.path.join(dirname, '../../amazon_gopro.json'), 'w+')
-# with open(os.path.join(dirname, '../../amazon_gopro.json'), 'w+') as data_file:
-#     if json.load(data_file) is not None:
-#         data = json.load(data_file)
-#         for review in data:
-#             id_list.append(review['id'])
+id_list = []
+
 
 class QuotesSpider(scrapy.Spider):
     name = "amazon_gopro"
@@ -22,6 +18,10 @@ class QuotesSpider(scrapy.Spider):
     def parse(self, response):
 
         for review in response.css('div.aok-relative'):
+
+            # Store review ID as a variable to check if the review has already been scraped.
+            # If the ID is not in the global array, the yield will run. Otherwise, print a
+            # simple notification about the duplicate.
             new_id = review.css('div.review::attr(id)').get()
             if new_id not in id_list:
                 id_list.append(new_id)
@@ -35,11 +35,16 @@ class QuotesSpider(scrapy.Spider):
             else:
                 print("DUPLICATE FOUND")
 
+        # If there is an "all reviews" button, follow that URL and repeat the scraping.
+        # This lets the spider work from the main item page, then continue on the "all reviews" page.
         all_reviews = response.css('div#reviews-medley-footer a.a-text-bold::attr(href)').get()
         if all_reviews is not None:
             all_reviews = response.urljoin(all_reviews)
             yield scrapy.Request(all_reviews, callback=self.parse)
 
+        # The main item page doesn't have a "next page" target, but the "all reviews" pages do.
+        # After the above "all reviews" callback runs the first time, the all_reviews variable will
+        # be null and the following next_page variable will have a value.
         next_page = response.css('li.a-last a::attr(href)').get()
         if next_page is not None:
             next_page = response.urljoin(next_page)
