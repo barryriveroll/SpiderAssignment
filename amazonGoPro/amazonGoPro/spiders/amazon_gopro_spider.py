@@ -6,6 +6,8 @@ from scrapy.conf import settings
 
 class QuotesSpider(scrapy.Spider):
     name = "amazon_gopro"
+
+    # user_agent variable helps Amazon see that this scraper is NOT a bot ;)
     user_agent = 'Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.157 Safari/537.36'
     start_urls = [
         'https://www.amazon.com/GoPro-Fusion-Waterproof-Digital-Spherical/dp/B0792MJLNM/ref=sr_1_3?crid=D3C7EDM435E7&keywords=gopro+fusion&qid=1550442454&s=electronics&sprefix=GoPro+Fu%2Celectronics%2C1332&sr=1-3',
